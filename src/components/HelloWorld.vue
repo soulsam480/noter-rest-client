@@ -1,49 +1,69 @@
 <template>
-  <label for="email">Email</label>
-  <input type="email" name="email" id="email" v-model="user.email" />
-  <br />
-  <br />
-  <label for="passd">Password</label>
-  <input
-    type="password"
-    name="password"
-    id="passd"
-    v-model="user.password"
-  /><br />
-  <br />
-  <button @click="login">Login</button>
+  <div>
+    <div v-if="user">
+      <p>{{ user.name }}</p>
+      <p>{{ user.email }}</p>
+      <p>{{ user.userId }}</p>
+    </div>
+    <div v-else>
+      <p>error</p>
+    </div>
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" v-model="newUser.email" />
+    <br />
+    <br />
+    <label for="passd">Password</label>
+    <input
+      type="password"
+      name="password"
+      id="passd"
+      v-model="newUser.password"
+    /><br />
+    <br />
+    <button @click="login">Login</button>
 
-  <br />
-  <br />
+    <br />
+    <br />
 
-  <button @click="newToken">Request for new token</button>
+    <button @click="newToken">Request for new token</button>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { computed, defineComponent, reactive, ref } from "vue";
 import axios from "axios";
+import store from "@/store";
+import { User } from "@/entities/models";
 export default defineComponent({
   setup() {
-    const user = reactive({
+    const newUser = reactive({
       email: "" as string,
       password: "" as string,
+    });
+
+    const user = computed<User>(() => {
+      return store.getters.giveUser;
     });
     const login = async () => {
       await axios({
         method: "post",
         url: "http://localhost:4000/login",
         data: {
-          email: user.email,
-          password: user.password,
+          email: newUser.email,
+          password: newUser.password, 
         },
         withCredentials: true,
       })
         .then((res) => {
+          store.commit("addUser", {
+            name: res.data.name,
+            email: res.data.email,
+            userId: res.data.userId,
+          } as User);
           console.log(res);
-          localStorage.setItem("userId", res.data.userId);
         })
         .catch((err) => {
-          console.log(err);
+          store.commit("addUser", null);
         });
     };
 
@@ -72,7 +92,7 @@ export default defineComponent({
           console.log(err);
         });
     };
-    return { user, login, newToken };
+    return { user, newUser, login, newToken };
   },
 });
 </script>
