@@ -28,29 +28,49 @@ export default defineComponent({
       email: "" as string,
       password: "" as string,
     });
-    const login = () => {
-      axios({
+    const login = async () => {
+      await axios({
         method: "post",
         url: "http://localhost:4000/login",
         data: {
           email: user.email,
           password: user.password,
         },
+        withCredentials: true,
+      })
+        .then((res) => {
+          console.log(res);
+          localStorage.setItem("userId", res.data.userId);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    const newToken = async () => {
+      axios({
+        method: "post",
+        url: "http://localhost:4000/token",
+        withCredentials: true,
       }).then((res) => {
         console.log(res);
       });
     };
 
-    const newToken = () => {
-      axios({
+    const logOut = async () => {
+      await axios({
         method: "post",
-        url: "http://localhost:4000/token",
-        withCredentials: true,
-        xsrfCookieName: 'refreshToken',
-        
-      }).then((res) => {
-        console.log(res);
-      });
+        url: "http://localhost:4000/logout",
+        data: {
+          userId: localStorage.getItem("userId"),
+        },
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
     return { user, login, newToken };
   },
