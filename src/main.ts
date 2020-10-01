@@ -7,19 +7,28 @@ import store from './store';
     const loggedIn = document.cookie.split('; ')
         .find(row => row.startsWith('loggedIn'))?.split('=')[1]
     if (loggedIn === "true") {
+
         try {
-            axios({
-                method: "post",
-                url: "http://localhost:4000/token",
-                withCredentials: true,
-            }).then((res) => {
-                console.log(res);
-                store.commit("addToken", res.data.accesToken)
-            });
-        } catch (err) {
-            store.commit("adduser", null)
-            store.commit("addToken", null)
+
+        } catch (error) {
+
         }
+
+        setTimeout(async () => {
+            try {
+                axios({
+                    method: "post",
+                    url: "http://localhost:4000/token",
+                    withCredentials: true,
+                }).then((res) => {
+                    console.log(res);
+                    store.commit("addToken", res.data.accesToken)
+                });
+            } catch (err) {
+                store.commit("adduser", null)
+                store.commit("addToken", null)
+            }
+        }, 840000)
     }
 })()
 
