@@ -1,3 +1,4 @@
+import { User } from './entities/models';
 import { createApp } from 'vue'
 import App from './App.vue'
 import axios from "axios";
@@ -9,9 +10,23 @@ import store from './store';
     if (loggedIn === "true") {
 
         try {
-
+            axios({
+                method: "post",
+                url: "http://localhost:4000/getuserdata",
+                withCredentials: true,
+            }).then((res) => {
+                console.log(res);
+                store.commit("addUser", {
+                    name: res.data.name,
+                    email: res.data.email,
+                    userId: res.data.userId,
+                } as User);
+                store.commit("addToken", res.data.accesToken)
+            });
         } catch (error) {
 
+            store.commit("adduser", null)
+            store.commit("addToken", null)
         }
 
         setTimeout(async () => {

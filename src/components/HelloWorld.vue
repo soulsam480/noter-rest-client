@@ -6,7 +6,7 @@
       <p>{{ user.userId }}</p>
     </div>
     <div v-else>
-      <p>error</p>
+      <p>Logged Out</p>
     </div>
     <label for="email">Email</label>
     <input type="email" name="email" id="email" v-model="newUser.email" />
@@ -25,6 +25,7 @@
     <br />
     <br />
 
+    <button @click="logOut">logOut</button>
     <button @click="newToken">Request for new token</button>
   </div>
 </template>
@@ -50,7 +51,7 @@ export default defineComponent({
         url: "http://localhost:4000/login",
         data: {
           email: newUser.email,
-          password: newUser.password, 
+          password: newUser.password,
         },
         withCredentials: true,
       })
@@ -81,18 +82,16 @@ export default defineComponent({
       await axios({
         method: "post",
         url: "http://localhost:4000/logout",
-        data: {
-          userId: localStorage.getItem("userId"),
-        },
+        withCredentials: true,
       })
         .then((res) => {
-          console.log(res);
+          store.commit("addUser", null);
         })
         .catch((err) => {
           console.log(err);
         });
     };
-    return { user, newUser, login, newToken };
+    return { logOut, user, newUser, login, newToken };
   },
 });
 </script>
